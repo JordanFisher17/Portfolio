@@ -2,7 +2,7 @@
 A Github Repository demonstrating my Developer Portfolio
 
 
-1. Secure Notes
+1. Secure Notes - Kotlin / XML
    
     The source code contained within this file group is that used to create a basic Android Application using the programming languages Kotlin and Java.
     This project was an early creation, created as a final piece of work for a short Computer Science course undertaken before enrolling on my MSc Computer
@@ -10,7 +10,7 @@ A Github Repository demonstrating my Developer Portfolio
     Kotlin or Java languages and instead focused on Web Application development using Python, HTML and CSS. 
     
     
-3. Finance
+3. Finance - Python / SQLite3 / HTML / CSS
    
     This file contains the Source Code for a Web Application written in Python, HTML and CSS, completed as part of a Computer Science course.
     With the exception of helpers.py and apology.html which were provided by the course facilitators, the Source Code files were created by myself.
@@ -18,6 +18,6 @@ A Github Repository demonstrating my Developer Portfolio
     using a SQL Databased using SQLite3.
 
 
-5. Graphical User Interface
+5. Graphical User Interface - Java
    
    The source code contained within this directory demonstrates part of my contribution to a larger project. As part of this project I was tasked to work with a Object Orientated Model in order to create a popular puzzle game. Part of my role within this project was to create the Graphical User Interface for this game which would interact with the model itself utilising the model-view-controller paradym. Further to this, I was also resonsible for the development and execusion of a test plan for this overall project which used a combination of manual and unit testing using J-Unit. Whilst I worked on other classes within the model, only those completed entirely by me have been uploaded.
