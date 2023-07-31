@@ -1,0 +1,146 @@
+import java.io.*;
+import java.lang.String.*;
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import java.awt.event.*;
+/**
+ * This Class is used as part of the model's Graphical User Interface(GUI) in order to create a new JButton that corrosponds to each
+ * of the Cell Objects used by the model itself. This object is used to store the state for each of the cells in the game in 
+ * addition to their location on the GUI's grid.
+ *
+ * @author (Jordan Fisher)
+ * @version (Version 1, 03/01/2023)
+ */
+public class PanelCell extends JButton implements Observer
+{
+    // instance variables - replace the example below with your own
+    private int row;
+    private int col;
+    private int state;
+    private Nonogram puzzle;
+    private NonogramGUI GUI;
+
+    /**
+     * Constructor for objects of class PanelCell
+     * @param The row of where the object is created within the grid.
+     * @param The column of where the object is created within the grid.
+     * The Constructor uses these objects to initialise the object and create the JButton.
+     */
+    public PanelCell(int row, int col, Nonogram puzzle, NonogramGUI GUI)
+    {
+        super();
+        if (puzzle == null)
+        {
+            throw new NonogramException("puzzle is null");
+        }
+        else if (GUI == null)
+        {
+            throw new NonogramException("GUI is null");
+        }
+        else
+        {
+            this.row = row;
+            this.col = col;
+            this.puzzle = puzzle;
+            this.GUI = GUI;
+            state = puzzle.UNKNOWN;
+
+            addMouseListener(new MouseAdapter() //Add a Mouse Listener to each of the PanelCells so that the user can click them.
+                {
+                    @Override
+                    public void mouseEntered(MouseEvent evt)
+                    {
+                        requestFocusInWindow();
+                    }
+
+                    @Override
+                    public void mouseClicked(MouseEvent evt)
+                    {
+                        GUI.move(row, col, state);
+                    } 
+                });
+
+            setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            setOpaque(true);
+            updateColor();
+        }
+    }
+
+    /**
+     * A method which returns to the caller what the state of the object's row field is.
+     * @return the integer value of the objects row within the grid.
+     */
+    public int getRow()
+    {
+        return row;
+    }
+
+    /**
+     * A method which returns to the caller what the state of the object's col (column) field is.
+     * @return the integer value of the objects column within the grid.
+     */
+    public int getCol()
+    {
+        return col;
+    }
+
+    /**
+     * A method which returns to the caller what the state field of the object indicated whether it is marked a full, empty or 
+     * unknown.
+     * @return the integer value of the objects state field.
+     */
+    public int getState()
+    {
+        return state;
+    }
+
+    /**
+     * A Command method which allows the caller to change the state field of the object.
+     * @param the integer value of the new state which is to be applied to the object.
+     */
+    public void changeState(int state)
+    {
+        if (state >= 0 && state <=2)
+        {
+            this.state = state;
+        }
+        else
+        {
+            throw new NonogramException("State must be between 0 and 2. " +
+                state + " is not valid");
+        }
+    }
+
+    /**
+     * Update() - These method implements that of the Observer Interface and ensures that when
+     * the model is updated and calls its notifyObservers method that the state of the relevant
+     * PanelCell object is also updated. This method also then calls the updateColor method
+     * to ensure that the GUI is correctly updated for the user to see.
+     */
+    public void update(Observable observe, Object obj)
+    {
+        changeState(puzzle.getState(row, col));
+        updateColor();
+    }
+
+    /**
+     * Update Color - A message that takes no parameters and will change the color of the 
+     * PanelCell JButton based on its state attribute.
+     */
+    public void updateColor()
+    {
+        if (state == puzzle.UNKNOWN)
+        {
+            setBackground(Color.WHITE);
+        }
+        else if (state == puzzle.FULL)
+        {
+            setBackground(Color.BLACK);
+        }
+        else if (state == puzzle.EMPTY)
+        {
+            setBackground(Color.RED);
+        }
+    }
+}

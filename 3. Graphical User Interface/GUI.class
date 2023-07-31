@@ -1,0 +1,550 @@
+import java.io.*;
+import java.lang.String.*;
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import java.awt.event.*;
+import java.awt.event.ActionListener;
+
+/**
+ * This Class creates an object to serve as a Graphical User Interface for the
+ * Nonogram model game. The class itself utilises Swing features in order to do
+ * this and then goes on to impliment the methods required to interact with the
+ * Nonogram games model.
+ *
+ * @author (Jordan Fisher)
+ * @version (Version 1, 03/01/2023)
+ */
+@SuppressWarnings("deprecation")
+public class NonogramGUI extends JFrame implements ActionListener
+{
+    private static final String NGFILE = "nons/tiny.non";
+
+    private JPanel mainPanel;
+    private Nonogram puzzle;
+    private PanelCell[][] grid;
+    private Scanner fileScanner;
+    private ArrayList<JTextArea> rowNums = new ArrayList<>();
+    private ArrayList<JTextArea> colNums = new ArrayList<>();
+    private Stack<Assign> storedMoves;
+    private int moveCount;
+
+    private JButton help;
+    private JButton clear;
+    private JButton undo;
+    private JButton save;
+    private JButton load;
+    private JTextField statusBar;
+    
+
+    /**
+     * Constructor for objects of class NewNonorgramGUI
+     */
+    public NonogramGUI()
+    {
+        super("Nonogram Game");
+        Scanner myScanner = new Scanner(System.in);
+        try{
+            fileScanner = new Scanner(new File(NGFILE));
+        } catch (FileNotFoundException ex){
+            System.out.println(NGFILE + "not found");
+        }
+        puzzle = new Nonogram(fileScanner);
+        storedMoves = new Stack<Assign>();
+        moveCount = 1;
+        mainPanel = new JPanel(new BorderLayout());
+        makeFrame();
+    }
+
+    /**
+     * A method to create the GUI's appearance. This method uses calls to other
+     * methods that have been written in order to create the individual elements
+     * of the GUI separately in their respective JPanels before combining them
+     * to be displayed in one JFrame.
+     */
+    private void makeFrame()
+    {
+        setSize(600,500);
+        setResizable(true);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        makeButtons();
+        makeGameBoard();
+        getContentPane().add(mainPanel); //Now that the main GUI Panel is assembled, add this to the JFrame's Content Pane.
+        pack();
+        setVisible(true);
+    }
+
+    /**
+     * makeGameBoard() - This method is called as part of the GUI instantization. This method
+     * draws on the values from the games model in order to establish the correct number of cells
+     * that are needed as for whichever Nonogram file has been loaded into the model. 
+     * 
+     * The method then calls on makeTextAreas() in order to build the ArrayLists storing the 
+     * Nonogram sequence information for each row and column.
+     * 
+     * This method then uses for loops in order to iterate over the data held and to build this
+     * into a visble grid for the user, before adding the grid to the main gamePanel attribute.
+     */
+    private void makeGameBoard()
+    {
+        int row = puzzle.getNumRows();
+        int col = puzzle.getNumCols();
+
+        //The Grid will need to be larger than the Game to accommodate the row and column headers.
+        int gridRows = row + 1; 
+        int gridCols = col + 1;
+
+        //Initialise the Grid and the Games Panel
+        grid = new PanelCell[row][col];
+        JPanel gameBoard = new JPanel(new GridLayout(gridRows, gridCols));
+
+        //Create a Buffer text area to take up the space of the first collumn.
+        JTextArea buffer = new JTextArea();
+        buffer.setBackground(Color.LIGHT_GRAY);
+        gameBoard.add(buffer);
+
+        makeTextAreas();
+
+        for (int i = 0; i < gridRows; i++)
+        {
+            for (int j = 0; j < gridCols; j++)
+            {   
+                if (i == 0 && j != 0)
+                {
+                    gameBoard.add(colNums.get(j -1));
+                }
+                else if (j == 0 && i != 0)
+                {
+                    gameBoard.add(rowNums.get(i -1));
+                }
+                else if (i != 0 && j !=0)
+                {
+                    grid[i - 1][j - 1] = new PanelCell(i-1, j-1, puzzle, this);
+                    puzzle.addObserver(grid[i - 1][j - 1]);
+                    gameBoard.add(grid[i - 1][j - 1]);
+                }
+            }
+        }
+        mainPanel.add(gameBoard, BorderLayout.CENTER);
+    }
+
+    /**
+     * makeTextAreas() - Taking information from the model for how many rows and columns are
+     * required, the method then uses a file scanner and while loops in order to draw the 
+     * Nonogram sequence information out of the Nonogram File and stores this into two Separate
+     * ArrayLists.
+     */
+    private void makeTextAreas()
+    {
+        Scanner myScanner = new Scanner(System.in);
+        Scanner fileScanner = null;
+        int row = puzzle.getNumRows();
+        int col = puzzle.getNumCols();
+
+        try{
+            fileScanner = new Scanner(new File(NGFILE));
+        }catch(IOException ex){
+            System.out.print("IO Error detected");
+            System.exit(0);
+        }
+
+        while (fileScanner.hasNext())
+        {
+            String label = fileScanner.nextLine();
+            if (label.equals("rows"))
+            { 
+                for (int i = 0; i < row; i++)
+                {
+                    String tmp = fileScanner.nextLine();
+                    String newString = tmp.replace(",", ", ");
+                    JTextArea rowText = new JTextArea(newString);
+                    rowText.setEditable(false);
+                    rowText.setBackground(Color.LIGHT_GRAY);
+                    rowNums.add(rowText);
+                }
+            }
+
+            else if (label.equals("columns"))
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    String tmp = fileScanner.nextLine();
+                    String newString = tmp.replace(",", "\n");
+                    JTextArea colText = new JTextArea(newString);
+                    colText.setEditable(false);
+                    colText.setBackground(Color.LIGHT_GRAY);
+                    colNums.add(colText);
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * makeButtons() - A method to create the menu buttons for the Graphical User Interface
+     * adding these to the GamePanel for the user to see and use. The method also adds Action 
+     * Listeners to each of the JButtons so that functionality can be later added to them.
+     */
+    private void makeButtons()
+    {
+        JPanel menu = new JPanel(new GridLayout(5,1));
+
+        help = new JButton("Help");
+        clear = new JButton("Clear");
+        undo = new JButton("Undo");
+        save = new JButton("Save");
+        load = new JButton("Load");
+        statusBar = new JTextField();
+        statusBar.setEditable(false);
+
+        help.addActionListener(this);
+        clear.addActionListener(this);
+        undo.addActionListener(this);
+        save.addActionListener(this);
+        load.addActionListener(this);
+
+        menu.add(help);
+        menu.add(clear);
+        menu.add(undo);
+        menu.add(save);
+        menu.add(load);
+
+        mainPanel.add(menu, BorderLayout.WEST);
+        mainPanel.add(statusBar, BorderLayout.SOUTH);
+    }
+
+    /**
+     * ActionPerformed() - The Override of this method is done as part of the implementation
+     * of ActionListener. This method take the user's input by means of one of the GUI's
+     * JButtons being clicked and dependant on what which of the JButtons have been clicked 
+     * will determine which route is taken.
+     */
+    @Override
+    public void actionPerformed(ActionEvent evt)
+    {
+        if (evt.getSource() == help)
+        {
+            help();
+        }
+        else if (evt.getSource() == clear)
+        {
+            clear();
+        }
+        else if (evt.getSource() == undo)
+        {
+            undo();
+        }
+        else if (evt.getSource() == save)
+        {
+            try
+            {
+                save();
+            } catch (IOException e) 
+            {
+                new NonogramException("File could not be saved");
+            }
+        }
+        else if (evt.getSource() == load)
+        {
+            try
+            {
+                load();
+            }
+            catch (ClassNotFoundException ex)
+            {
+                new NonogramException("File could not be located");
+            }
+        }
+
+    }
+
+    /**
+     * Move() - This method take the users input via them clicking a JButton and triggering
+     * the actionPerformed method. If the user has triggered one of the grids cells, depending
+     * on what the current state of the grid's PanelCell is will determine what action is taken.
+     * 
+     * The purpose of this method is to do two things, first store the user's move as an Assign
+     * Object so that this can be stored and saved to a file or used to undo a move later on.
+     * 
+     * The second thing this method does is to change the state of the model using it's setState
+     * method which triggers the Observer notification.
+     */
+    protected void move(int row, int col, int state)
+    {
+        Assign userMove;
+        
+        if (state < 0 || state > 2)
+        {
+            throw new NonogramException("State is out of bounds");
+        }
+        
+        else if (state == puzzle.UNKNOWN)
+        {
+            userMove = new Assign(row, col, puzzle.FULL, moveCount);
+            storedMoves.push(userMove); //Store the move for saving.
+
+            puzzle.setState(row, col, puzzle.FULL);
+        }
+        else if (state == puzzle.FULL)
+        {
+            userMove = new Assign(row, col, puzzle.EMPTY, moveCount);
+            storedMoves.push(userMove);
+
+            puzzle.setState(row, col, puzzle.EMPTY);
+        }
+        else if (state == puzzle.EMPTY)
+        {
+            userMove = new Assign(row, col, puzzle.UNKNOWN, moveCount);
+            storedMoves.push(userMove);
+
+            puzzle.setState(row, col, puzzle.UNKNOWN);
+        }
+        moveCount++;
+        solvedAlert(row, col); //Has the player solved a Column or Row. If so display this to the user.
+
+    }
+
+    /**
+     * Overloaded move method - Accepts an Assign Object as a paramater so that moves can be
+     * loaded from a file into the GUI.
+     * 
+     * @param Assign loadedMove - The Assign object that has been loaded from the saved file.
+     */
+    private void move(Assign loadedMove)
+    {
+        int row = loadedMove.getRow();
+        int col = loadedMove.getCol();
+        int state = loadedMove.getState();
+
+        puzzle.setState(row, col, state); //Uses the setState method that updates the observers.
+        moveCount = loadedMove.getMoveCount() + 1;
+        solvedAlert(row, col);
+        
+    }
+
+    /**
+     * solvedAlert() - A method to determine whether the user has solved a particular row or 
+     * column and to update the GUI accordingly. 
+     * 
+     * @param row - The integer value for the row to be checked. 
+     * @param col - The integer value for the column to be checked.
+     * 
+     * Both the row and rol parameters are provided by the move() method as the row and column
+     * that have just being changed.
+     */
+    private void solvedAlert(int row, int col)
+    {
+        if (puzzle.isRowSolved(row) == true)
+        {
+            rowNums.get(row).setBackground(Color.green);
+        }
+        else if (!puzzle.isRowValid(row)) 
+        {
+            rowNums.get(row).setBackground(Color.red);
+        }
+        else
+        {
+            rowNums.get(row).setBackground(Color.LIGHT_GRAY);
+        }
+
+        if (puzzle.isColSolved(col) == true)
+        {
+            colNums.get(col).setBackground(Color.green);
+        }
+        else if (!puzzle.isColValid(col))
+        {
+            colNums.get(col).setBackground(Color.red);
+        }
+        else
+        {
+            colNums.get(col).setBackground(Color.LIGHT_GRAY);
+        }
+        
+        if (puzzle.isSolved())
+        {
+            statusBar.setText("Congratulations, you have solved the Puzzle :)");
+        }
+    }
+
+    /**
+     * help() - A method that displays a message dialog and informs the user of the rules and 
+     * controls of the game.
+     */
+    private void help()
+    {
+        JOptionPane helpMessage = new JOptionPane();
+
+        helpMessage.showMessageDialog(mainPanel,
+            "Nonogram is a puzzle game whereby you must color in "
+            + "the grid according to the contiguous full cells "
+            + "which are displayed above the columns and next to the "
+            + "rows \n"
+            + "To make a move, click the buttons for the cells. A "
+            + "Black cell indicates you believe the cell to be full, "
+            + "Red cells are those you believe to be empty, and "
+            + "marking the cell \n as White indicates that the cell is "
+            + "unknown."
+            + "\n As you play, the row and column headers will change "
+            + "color. green indicates that the pattern matches, but "
+            + "this may still be incorrect. Red shows that a move is "
+            + " incorrect. \n " + "To change the color of the cells, "
+            + "keep clicking them.");
+
+    }
+
+    /**
+     * clear() - A method to clear the Graphical User Interface and the model of any moves made
+     * resetting this as though the game has just started. This is done, by a call to the models
+     * clear() method to reset the model, before then disposing of the original GUI and creating
+     * a new one.
+     */
+    private void clear()
+    {
+        String message = ("Are you sure you wish to start a new game? " +
+                "This cannot be undone");
+        String title = ("Clear");
+
+        int clearMessage = JOptionPane.showConfirmDialog(mainPanel, message, title,
+                JOptionPane.YES_NO_OPTION);
+
+        if (clearMessage == JOptionPane.YES_OPTION)
+        {
+            puzzle.clear();
+            dispose();
+
+            new NonogramGUI();
+            storedMoves = new Stack<Assign>();
+            moveCount = 1;
+        }
+    }
+
+    /**
+     * undo() - This method removes the last move made by the user. The moves that the user makes
+     * are stored within a Stack Object. Here the last move is removed from the stack. If the
+     * Panelcell in question has been previously assigned, a loop locates this previous assignment
+     * within the stack and restores it. If this is the first time that Panelcell has been assigned,
+     * the PanelCell is returned to it's original state.
+     */
+    private void undo()
+    {
+        if (storedMoves.isEmpty())
+        {
+            JOptionPane.showMessageDialog(mainPanel, "There are no moves to undo");
+        }
+        else
+        {
+            
+            Iterator<Assign> it = storedMoves.iterator();
+            while (it.hasNext())
+            {
+                Assign temp = it.next();
+                if (temp.getMoveCount() == moveCount - 1)
+                {
+                    it.remove();
+                    puzzle.clear();
+                    solvedAlert(temp.getRow(), temp.getCol());
+                }
+            }
+            
+            
+            for (Assign move : storedMoves)
+            {
+                //Setting the moves directly to the model instead of using move() so to retain the correct move count.
+                puzzle.setState(move.getRow(), move.getCol(), move.getState());
+            }
+            moveCount -= 1;
+        }
+        
+        // For testing System.out.println(moveCount);
+
+    }
+
+    /**
+     * save() - A method which takes the Objects current stored within the Stack
+     * Object storedMoves and writes these to file using Object Serialisation.]
+     * The method uses a dialoge window in order to take a file name as user
+     * input.
+     * @return boolean - True if the game has been saved or false if this could not be completed. This also handles a null
+     * pointer exception that would otherwise be thrown due to calling isEmpty() on a null value in the event that the user
+     * presses the cancel button.
+     */
+    private boolean save() throws IOException
+    {
+        if (storedMoves.isEmpty())
+        {
+            JOptionPane emptyMessage = new JOptionPane();
+            emptyMessage.showMessageDialog(mainPanel, "There are no moves to save");
+        }
+        else
+        {
+            String fileName = JOptionPane.showInputDialog(mainPanel, "Enter a File Name");
+            if (fileName == null)
+            {
+                return false;
+            }
+
+            if (!fileName.strip().isEmpty())
+            {
+                ObjectOutputStream savedFile = new ObjectOutputStream(
+                        new FileOutputStream(fileName));
+                savedFile.writeObject(storedMoves);
+                savedFile.close();
+
+                new JOptionPane().showMessageDialog(mainPanel, "Game Saved");
+
+            }
+            else if(fileName.strip().isEmpty())
+            {
+                JOptionPane.showMessageDialog(mainPanel, "The game could not save as you did not enter a file name");
+                return false;
+                
+            }
+            
+        }
+        return true;
+
+    }
+
+    /**
+     * load() - Using Object Serialization this method then retrieves a the 
+     * Stack Object previous saved via the save() method. It then uses a for-each
+     * loop to iterate through each of the Assign Objects stored within that 
+     * Stack and uses the overloaded move() method to place them back into the
+     * GUI and the model.
+     * 
+     * @return boolean - True if the file has been successfully loaded and false if it could not be loaded. This return
+     * statement also handles a null pointer exception in the event that the user presses the cancel button.
+     */
+    private boolean load() throws ClassNotFoundException
+    {
+        if (!storedMoves.isEmpty())
+        {
+            JOptionPane.showMessageDialog(mainPanel, "Before loading you must first clear the current game");
+        }
+        else
+        {
+            String fileName = JOptionPane.showInputDialog(mainPanel, "Enter a File Name to Load");
+            if (fileName == null)
+            {
+                return false;
+            }
+                
+            try{
+                ObjectInputStream loadFile = new ObjectInputStream(new FileInputStream(fileName));
+                storedMoves = (Stack)loadFile.readObject();
+                loadFile.close();
+            } catch (IOException loadFile){
+                new JOptionPane().showMessageDialog(mainPanel, "Error IO Exception, File not found");
+            }
+
+            for (Assign loadedMove : storedMoves)
+            {
+                move(loadedMove); //via the overloaded Move() method.
+            }
+        }
+        return true;
+    }
+    
+}
