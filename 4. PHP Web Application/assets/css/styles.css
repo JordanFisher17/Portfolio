@@ -1,0 +1,362 @@
+/* CSS Code for the index.html page, including the Header, Nav Bar and Footer */
+
+/* CSS Specific to the Brand name within the header
+Font File obtained from: (Google, Unknown).
+*/
+@font-face {
+    font-family: playfair;
+    src: url(../fonts/PlayfairDisplay-VariableFont_wght.ttf);
+}
+
+.background {
+    background-image: url(../images/headerimg.jpg);
+    background-position: center;
+    background-size: cover;
+    height:300px;
+
+}
+
+header {
+    background-color:#78C7C7;
+    margin: 0;
+    width:auto;
+}
+
+
+.brand {
+    font-family: playfair, Verdana, sans-serif;
+    color: #F0F8FF;
+    text-align: left;
+    padding-left: .5em;
+}
+
+#header-buttons {
+   float: right;
+   padding: 1em;
+    
+}
+
+#header-buttons a {
+    text-decoration: none;
+    font-family: Verdana, sans-serif;
+    color:#F0F8FF;
+    font-size: 1em;
+    margin-left: 1em;
+}
+
+#header-buttons a:hover {
+    font-style: bold;
+    color: #78C7C7;
+}
+
+/* CSS Code for the Nav Bar */
+nav ul {
+    margin: 0;
+    padding-top: .5em;
+    list-style: none;
+
+}
+
+nav li {
+    display: inline-block;
+    margin-left: 5em;
+}
+
+nav li a {
+    text-decoration: none;
+    font-family: Verdana, sans-serif;
+    color:#5A5A5A;
+    font-size: 1em;
+    
+}
+
+li a:hover {
+    font-style: bold;
+    color: #78C7C7;
+
+}
+
+/* CSS Code for the styling of the Index plages main element */
+
+#indeximage {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+}
+
+main {
+    font-family:verdana, sans-serif;
+    color:#5A5A5A;
+}
+
+/* CSS Code for the display of the footer bar */
+footer {
+    background-color: #5A5A5A;
+    font-family:verdana, sans-serif;
+    font-size: .75em;
+    color:#F0F8FF;
+    text-align:center;
+    margin: 0;
+    padding: 1%;
+    height: auto;
+}
+
+
+footer ul {
+    padding-top: .5em;
+    list-style: none;
+}
+
+footer li {
+    
+    margin-right: 3em;
+    padding-top: .5em;
+}
+
+footer li a {
+    text-decoration: none;
+    font-family: Verdana, sans-serif;
+    color:#F0F8FF;
+}
+
+
+/* CSS Code for the centerblock class, this is used as the main backdrop for a number of pages*/
+
+.centerblock {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #78C7C7;
+    border: thick solid #5A5A5A;
+    text-align: center;
+    align-items: center;
+    font-size: 1.25em;
+    font-family: Verdana, sans-serif;
+    height: auto;
+    min-height: 30em;
+    width: 40%;
+    padding-top: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: auto;
+    margin-right: auto;
+    
+
+}
+
+.centerblock ul {
+    font-size: .7em;
+    padding: 1%;
+    margin: 2%;
+}
+
+.heading {
+    text-align: center;
+}
+
+label {
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+input {
+    display: block;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: left;
+    min-width: 70%;
+    max-width: 80%;
+
+}
+
+textarea {
+    display: block;
+    min-width: 75%;
+    max-width: 80%;
+    margin-top: 2%;
+    margin-right: 2%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.error {
+    font-size: .75em;
+    color: #FF0000;
+}
+
+.smallprint {
+    font-size: .65em;
+}
+
+/* CSS Code for the Excursions Page the Excursions Details Page */
+
+.excudiv { /* An outer Division for the excursions page (This is required due to a requirement for this page to use flex-direction column */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: thick solid;
+    border-color: #5A5A5A;
+    background-color: #78C7C7;
+    margin: 1%;
+    
+}
+
+
+.mainlist { /* The Container which the details and image of the excursion will be placed within their own divs */
+    display: flex;
+    flex-direction: row;
+    border: thick solid #5A5A5A;
+    max-width: 80%;
+    min-width: 80%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    background-color:#fdfdfd;
+    padding: none;
+    
+
+}
+
+#content {
+    text-align: left;
+    margin: 1%;
+}
+
+.inlineheading {
+    display: inline;
+}
+
+/* CSS Code for the About Us and Contact Web Page */
+
+.outerdiv {
+    display: flex;
+    flex-direction: row;
+    border: thick solid;
+    border-color: #78C7C7;
+    margin: 1%;
+    
+}
+
+.leftdiv {
+    width: 50%;
+    text-align: center;
+    align-items: center;
+    border: thick solid #5A5A5A;
+    margin: 5%;
+    padding: 1%;
+    max-height: 50%;
+
+}
+
+.rightdiv {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    text-align: center;
+    align-items: center;
+    border: thick solid #5A5A5A;
+    margin: 5%;
+    padding: 1%;
+    overflow: hidden;
+    
+}
+
+.img { /* This CSS is for <img> tags in order to style them within their divisions */
+    max-width: 100%;
+    object-fit: scale-down;
+    max-height: 100%;
+}
+
+button {
+    color: #F0F8FF;
+    font-size: .8em;
+    border-radius: 50%;
+    border: solid thin #F0F8FF;
+    background-color: #5A5A5A;
+    cursor: pointer;
+    margin-bottom: 1em;
+    padding: .75em;
+    align-self: center;
+}
+
+/*Styling for the credits page. Due to the references containing long URL's they experience overflow of their containers
+the following code ensures that they do not, however, this causes words to break mid word*/
+.credits li {
+    margin: 2em;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+
+}
+
+
+.booking {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* This styling is required to pass html validator checks as wrapping an anchor within a button is not valid html */
+.viewbtn {
+    text-decoration: none;
+    font-family: Verdana, sans-serif;
+    color: #f0f0f0;;
+    font-size: .8em;
+    border-radius: 50%;
+    background-color: #5A5A5A;
+    padding: .75em;
+}
+
+.viewbtn:hover{
+    font-style: bold;
+    color: #78C7C7;
+}
+
+
+/* CSS Code specific to mobile devices with screens less than  750px wide*/
+@media screen and (max-width: 750px) {
+
+    nav {
+        display: flex;
+        justify-content: center;
+    }
+    nav li {
+        display: list-item;
+        list-style-type: none;
+        margin-left: 0;     
+    }
+     
+    .centerblock{
+        width: 75%;
+        min-height: auto;
+    }
+
+    .outerdiv {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .leftdiv {
+        width: 75%;
+    }
+
+    .rightdiv {
+        width: 75%;
+    }
+
+    .mainlist {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
